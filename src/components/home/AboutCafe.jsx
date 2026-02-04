@@ -22,7 +22,7 @@ const highlights = [
 
 const AboutCafe = () => {
     return (
-        <section className="py-24 bg-[#1a1a1a] relative overflow-hidden">
+        <section className="py-16 md:py-24 bg-[#1a1a1a] relative overflow-hidden">
             {/* Animated Background Elements */}
             <motion.div
                 initial={{ opacity: 0 }}

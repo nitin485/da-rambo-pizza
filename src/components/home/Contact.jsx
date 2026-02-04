@@ -4,7 +4,7 @@ import { MapPin, Phone, Clock, ExternalLink, Instagram, Facebook, Twitter, Messa
 
 const Contact = () => {
     return (
-        <section id="contact" className="py-20 bg-pizza-black relative overflow-hidden">
+        <section id="contact" className="py-12 md:py-20 bg-pizza-black relative overflow-hidden">
             {/* Elegant Background Particles */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-pizza-red/50 to-transparent" />
@@ -51,7 +51,7 @@ const Contact = () => {
                             {
                                 icon: Phone,
                                 title: "Direct Line",
-                                detail: "+91 98765 43210",
+                                detail: "+91 84481 61446",
                                 sub: "Priority delivery support",
                                 color: "text-pizza-yellow"
                             },
@@ -126,7 +126,7 @@ const Contact = () => {
                         <div className="absolute bottom-6 left-6 right-6">
                             <motion.a
                                 whileHover={{ y: -5 }}
-                                href="https://maps.app.goo.gl/YourActualLinkHere"
+                                href="https://maps.app.goo.gl/wgUByKX8XU2gBF2H8"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="block w-full bg-white text-black p-5 rounded-[1.5rem] shadow-2xl transition-all duration-300"

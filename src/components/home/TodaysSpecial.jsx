@@ -1,280 +1,248 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, Star, Clock, ArrowRight, Sparkles } from 'lucide-react';
+import { Clock, ArrowRight, Zap, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const specials = [
     {
         id: 1,
-        name: 'Ultimate Feast Pizza',
-        desc: 'Loaded with premium toppings, extra cheese & our signature sauce that will make your taste buds dance',
+        name: 'Ultimate Feast',
+        desc: 'Loaded with premium toppings & extra cheese.',
         price: 449,
         originalPrice: 549,
         image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1200&q=80',
-        tag: "Chef's Pick",
-        accent: 'from-orange-500 to-red-600',
+        tag: "HOT DROP",
+        accent: 'text-rose-400',
+        // "God Gradient" - Rich, deep, multi-stop
+        bg: 'bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-rose-500/40 via-orange-600/20 to-stone-900',
+        shape: 'rounded-[3rem_2rem_0rem_3rem]' // Unique geometric shape
     },
     {
         id: 2,
-        name: 'Truffle Mushroom Burger',
-        desc: 'Gourmet double patty burger with truffle mayo, caramelized onions & aged cheddar',
+        name: 'Truffle Burger',
+        desc: 'Gourmet double patty with truffle mayo.',
         price: 349,
         originalPrice: 429,
         image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80',
-        tag: 'Today Special',
-        accent: 'from-yellow-500 to-orange-500',
+        tag: 'TRENDING',
+        accent: 'text-amber-400',
+        bg: 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-500/30 via-amber-700/20 to-stone-900',
+        shape: 'rounded-[1rem_3rem_1rem_3rem]' // Leaf shape
     },
     {
         id: 3,
-        name: 'Signature Mojito',
-        desc: 'Refreshing mint & lime with our secret house blend - the perfect refresher',
+        name: 'Neon Mojito',
+        desc: 'Electric blue refresher with fresh mint.',
         price: 149,
         originalPrice: 199,
         image: 'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?auto=format&fit=crop&w=1200&q=80',
-        tag: 'Must Try',
-        accent: 'from-green-400 to-emerald-600',
+        tag: 'VIBE CHECK',
+        accent: 'text-cyan-400',
+        bg: 'bg-[conic-gradient(at_top_left,_var(--tw-gradient-stops))] from-cyan-500/30 via-blue-600/20 to-slate-900',
+        shape: 'rounded-[3rem_0rem_3rem_0rem]' // Diagonal
     },
 ];
 
 const TodaysSpecial = () => {
     const [activeIndex, setActiveIndex] = useState(0);
-    const [time, setTime] = useState({ hours: 8, minutes: 45, seconds: 30 });
-
     const activeItem = specials[activeIndex];
 
-    // Countdown
+    // Mouse position for parallax (optional subtle effect)
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
     useEffect(() => {
-        const timer = setInterval(() => {
-            setTime(prev => {
-                if (prev.seconds > 0) return { ...prev, seconds: prev.seconds - 1 };
-                if (prev.minutes > 0) return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-                if (prev.hours > 0) return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
-                return prev;
+        const handleMouseMove = (e) => {
+            setMousePos({
+                x: (e.clientX / window.innerWidth - 0.5) * 20,
+                y: (e.clientY / window.innerHeight - 0.5) * 20
             });
-        }, 1000);
-        return () => clearInterval(timer);
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
-    // Auto-cycle
     useEffect(() => {
         const interval = setInterval(() => {
             setActiveIndex((prev) => (prev + 1) % specials.length);
-        }, 6000);
+        }, 4500);
         return () => clearInterval(interval);
     }, []);
 
     return (
-        <section className="relative min-h-[700px] bg-pizza-black overflow-hidden">
-            {/* Full Background Image with Overlay */}
+        <section className="relative min-h-[60vh] bg-[#050505] overflow-hidden flex items-center py-12">
+
+            {/* Background Texture */}
+            <div className="absolute inset-0 opacity-20 pointer-events-none z-0 mix-blend-overlay"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E")` }}
+            />
+
             <AnimatePresence mode="wait">
                 <motion.div
-                    key={activeIndex}
-                    initial={{ opacity: 0, scale: 1.1 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    key={activeIndex + '-bg'}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="absolute inset-0"
-                >
-                    <img
-                        src={activeItem.image}
-                        alt=""
-                        className="w-full h-full object-cover"
-                    />
-                    {/* Dark Overlays */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/50" />
-                </motion.div>
+                    transition={{ duration: 1 }} // Smoother background fade
+                    className={`absolute inset-0 ${activeItem.bg} transition-all duration-700 blur-xl scale-110`}
+                />
             </AnimatePresence>
 
-            {/* Floating Particles */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                {[...Array(6)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        animate={{
-                            y: [-20, 20, -20],
-                            x: [-10, 10, -10],
-                            opacity: [0.3, 0.6, 0.3],
-                        }}
-                        transition={{
-                            duration: 4 + i,
-                            repeat: Infinity,
-                            delay: i * 0.5,
-                        }}
-                        className="absolute w-1 h-1 bg-pizza-yellow rounded-full"
-                        style={{
-                            top: `${20 + i * 15}%`,
-                            left: `${60 + i * 5}%`,
-                        }}
-                    />
-                ))}
+            {/* Marquee Background */}
+            <div className="absolute top-10 left-0 right-0 overflow-hidden opacity-[0.05] pointer-events-none">
+                <motion.div
+                    animate={{ x: [0, -1000] }}
+                    transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+                    className="whitespace-nowrap font-black text-[12vw] leading-none text-white font-heading tracking-tighter"
+                >
+                    TODAYS SPECIAL TODAYS SPECIAL TODAYS SPECIAL
+                </motion.div>
             </div>
 
-            {/* Content Container */}
-            <div className="relative z-10 container mx-auto px-6 py-20 min-h-[700px] flex items-center">
-                <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
+            <div className="container mx-auto px-6 relative z-10">
+                <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
 
-                    {/* Left - Content */}
-                    <div className="max-w-xl">
-                        {/* Badge */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="inline-flex items-center gap-3 mb-6"
-                        >
-                            <div className="flex items-center gap-2 bg-pizza-red/20 backdrop-blur-sm border border-pizza-red/30 text-pizza-red px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider">
-                                <Flame size={14} className="animate-pulse" />
-                                Limited Offer
-                            </div>
-                            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-2 rounded-full">
-                                <Clock size={14} className="text-pizza-yellow" />
-                                <span className="text-white font-mono text-sm">
-                                    {String(time.hours).padStart(2, '0')}:{String(time.minutes).padStart(2, '0')}:{String(time.seconds).padStart(2, '0')}
-                                </span>
-                            </div>
-                        </motion.div>
-
-                        {/* Tag */}
-                        <AnimatePresence mode="wait">
+                    {/* LEFT: Content */}
+                    <div className="lg:col-span-5 space-y-6">
+                        <div>
+                            {/* Shape-based Tag */}
                             <motion.div
                                 key={activeIndex + '-tag'}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: 20 }}
-                                className={`inline-block bg-gradient-to-r ${activeItem.accent} text-white px-4 py-1.5 rounded-full text-sm font-bold mb-4`}
+                                initial={{ opacity: 0, x: -20, rotate: -5 }}
+                                animate={{ opacity: 1, x: 0, rotate: 0 }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                                className={`inline-flex items-center gap-2 px-6 py-2 bg-white/10 backdrop-blur-xl border-l-4 border-b-4 border-white/20 rounded-tr-2xl rounded-bl-2xl mb-4 shadow-lg`}
                             >
-                                <span className="flex items-center gap-2">
-                                    <Sparkles size={14} />
+                                <Zap size={16} className={activeItem.accent} />
+                                <span className={`font-black tracking-widest text-sm uppercase text-white`}>
                                     {activeItem.tag}
                                 </span>
                             </motion.div>
-                        </AnimatePresence>
 
-                        {/* Title */}
-                        <AnimatePresence mode="wait">
                             <motion.h2
                                 key={activeIndex + '-title'}
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -30 }}
-                                transition={{ duration: 0.5 }}
-                                className="text-5xl md:text-6xl lg:text-7xl font-heading text-white mb-6 leading-tight"
+                                initial={{ opacity: 0, y: 50, skewY: 5 }}
+                                animate={{ opacity: 1, y: 0, skewY: 0 }}
+                                exit={{ opacity: 0, y: -50, skewY: -5 }}
+                                transition={{ type: "spring", bounce: 0.4, duration: 0.8 }}
+                                className="text-4xl sm:text-5xl md:text-7xl font-black font-heading text-white leading-[0.9] tracking-tighter mb-4 drop-shadow-2xl"
                             >
                                 {activeItem.name}
                             </motion.h2>
-                        </AnimatePresence>
 
-                        {/* Description */}
-                        <AnimatePresence mode="wait">
                             <motion.p
                                 key={activeIndex + '-desc'}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.5, delay: 0.1 }}
-                                className="text-lg text-gray-300 mb-8 leading-relaxed"
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="text-zinc-300 text-lg max-w-sm leading-relaxed"
                             >
                                 {activeItem.desc}
                             </motion.p>
-                        </AnimatePresence>
-
-                        {/* Rating */}
-                        <div className="flex items-center gap-4 mb-8">
-                            <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star key={i} size={18} className="text-pizza-yellow fill-pizza-yellow" />
-                                ))}
-                            </div>
-                            <span className="text-gray-400 text-sm">4.9 (2.5k+ reviews)</span>
                         </div>
 
                         {/* Price & CTA */}
-                        <div className="flex items-center gap-6">
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={activeIndex + '-price'}
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.8 }}
-                                    className="flex items-baseline gap-3"
-                                >
-                                    <span className="text-5xl font-bold text-white">₹{activeItem.price}</span>
-                                    <span className="text-xl text-gray-500 line-through">₹{activeItem.originalPrice}</span>
-                                </motion.div>
-                            </AnimatePresence>
+                        <motion.div
+                            key={activeIndex + '-cta'}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.3 }}
+                            className="flex flex-wrap items-center gap-6"
+                        >
+                            <div className="relative group/price cursor-default">
+                                <div className={`absolute -inset-1 rounded-lg blur opacity-25 group-hover/price:opacity-75 transition duration-500 ${activeItem.accent.replace('text-', 'bg-')}`} />
+                                <div className="relative flex items-baseline gap-2 bg-black/50 px-4 py-2 rounded-lg border border-white/10 backdrop-blur">
+                                    <span className={`text-4xl font-black ${activeItem.accent} drop-shadow-md`}>
+                                        ₹{activeItem.price}
+                                    </span>
+                                    <span className="text-lg text-zinc-500 line-through decoration-2">
+                                        ₹{activeItem.originalPrice}
+                                    </span>
+                                </div>
+                            </div>
 
                             <Link to="/menu">
                                 <motion.button
-                                    whileHover={{ scale: 1.05, x: 5 }}
+                                    whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="flex items-center gap-3 bg-pizza-red hover:bg-pizza-red/90 text-white px-8 py-4 rounded-full text-lg font-semibold transition-colors shadow-lg shadow-pizza-red/30"
+                                    className="relative flex items-center gap-3 px-8 py-3 bg-white text-black font-black text-sm uppercase tracking-wider rounded-tl-2xl rounded-br-2xl shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] hover:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.4)] transition-all"
                                 >
-                                    Order Now
-                                    <ArrowRight size={20} />
+                                    Grab It Now <ArrowRight size={18} />
                                 </motion.button>
                             </Link>
-                        </div>
+                        </motion.div>
                     </div>
 
-                    {/* Right - Item Selector */}
-                    <div className="hidden lg:flex flex-col gap-4 justify-center items-end">
-                        {specials.map((item, index) => (
+                    {/* RIGHT: Image Showcase */}
+                    <div className="lg:col-span-7 relative flex justify-center items-center h-[400px] perspective-1000">
+                        <AnimatePresence mode="wait">
                             <motion.div
-                                key={item.id}
-                                onClick={() => setActiveIndex(index)}
-                                whileHover={{ x: -10 }}
-                                className={`relative cursor-pointer group transition-all duration-300 ${index === activeIndex ? 'opacity-100' : 'opacity-50 hover:opacity-80'
-                                    }`}
+                                key={activeIndex + '-img'}
+                                initial={{ opacity: 0, rotateX: 10, rotateY: 10, scale: 0.8 }}
+                                animate={{ opacity: 1, rotateX: 0, rotateY: 0, scale: 1 }}
+                                exit={{ opacity: 0, rotateX: -10, rotateY: -10, scale: 1.1 }}
+                                transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
+                                style={{
+                                    transformStyle: 'preserve-3d',
+                                    x: mousePos.x,
+                                    y: mousePos.y
+                                }}
+                                className="relative w-full max-w-[500px] aspect-square"
                             >
-                                <div className={`flex items-center gap-4 bg-white/10 backdrop-blur-md rounded-2xl p-4 border ${index === activeIndex ? 'border-pizza-red' : 'border-white/10'
-                                    }`}>
-                                    <div className="w-20 h-20 rounded-xl overflow-hidden">
-                                        <img
-                                            src={item.image}
-                                            alt={item.name}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    <div className="text-right">
-                                        <h4 className="text-white font-semibold mb-1">{item.name}</h4>
-                                        <p className="text-pizza-yellow font-bold">₹{item.price}</p>
+                                {/* ABSTRACT GLOW BEHIND */}
+                                <div className={`absolute inset-10 rounded-full blur-[80px] opacity-60 animate-pulse ${activeItem.accent.replace('text-', 'bg-')}`} />
+
+                                {/* MAIN CARD with UNIQUE SHAPE */}
+                                <div className={`relative w-full h-full overflow-hidden border-4 border-white/10 shadow-2xl bg-[#121212] ${activeItem.shape}`}>
+                                    <img
+                                        src={activeItem.image}
+                                        alt={activeItem.name}
+                                        className="w-full h-full object-cover scale-110"
+                                    />
+
+                                    {/* Glass Overlay Details */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+
+                                    {/* Floating Element: Rating */}
+                                    <div className="absolute top-6 right-6 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20 flex items-center gap-1.5 shadow-xl">
+                                        <Star size={14} className="fill-yellow-400 text-yellow-400" />
+                                        <span className="text-white font-bold text-sm">4.9</span>
                                     </div>
                                 </div>
 
-                                {/* Active Indicator */}
-                                {index === activeIndex && (
-                                    <motion.div
-                                        layoutId="activeIndicator"
-                                        className="absolute -left-4 top-1/2 -translate-y-1/2 w-1 h-12 bg-pizza-red rounded-full"
-                                    />
-                                )}
+                                {/* Floating Discount Sticker - Now Rotates */}
+                                <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1, rotate: 12 }}
+                                    transition={{ delay: 0.4, type: "spring" }}
+                                    className="absolute -bottom-6 -left-6 z-20"
+                                >
+                                    <div className="bg-white text-black font-black text-xl p-5 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.5)] border-4 border-black clip-polygon-star">
+                                        <div className="text-center leading-tight">
+                                            -{(100 - (activeItem.price / activeItem.originalPrice * 100)).toFixed(0)}%
+                                            <div className="text-[10px] font-bold tracking-widest uppercase">OFF</div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+
                             </motion.div>
-                        ))}
+                        </AnimatePresence>
+
+                        {/* Custom Geometric Pagination */}
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3">
+                            {specials.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setActiveIndex(idx)}
+                                    className={`transition-all duration-500 ease-out border border-white/20 ${idx === activeIndex
+                                        ? `w-12 h-3 ${activeItem.accent.replace('text-', 'bg-')} shadow-[0_0_10px_currentColor]`
+                                        : 'w-3 h-3 bg-transparent hover:bg-white/20'
+                                        } rounded-none skew-x-[-12deg]`}
+                                />
+                            ))}
+                        </div>
                     </div>
+
                 </div>
-            </div>
-
-            {/* Bottom Progress Bar */}
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/10">
-                <motion.div
-                    key={activeIndex}
-                    initial={{ width: '0%' }}
-                    animate={{ width: '100%' }}
-                    transition={{ duration: 6, ease: 'linear' }}
-                    className="h-full bg-gradient-to-r from-pizza-red to-pizza-yellow"
-                />
-            </div>
-
-            {/* Mobile Dots */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 lg:hidden">
-                {specials.map((_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => setActiveIndex(index)}
-                        className={`h-2 rounded-full transition-all ${index === activeIndex ? 'w-6 bg-pizza-red' : 'w-2 bg-white/30'
-                            }`}
-                    />
-                ))}
             </div>
         </section>
     );

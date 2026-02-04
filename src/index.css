@@ -6,9 +6,10 @@
   --color-pizza-black: #0F0F0F;
   --color-pizza-yellow: #FFC107;
 
-  --font-heading: 'Bebas Neue', sans-serif;
+  --font-heading: 'Poppins', sans-serif;
   --font-body: 'Inter', sans-serif;
-  --font-accent: 'Poppins', sans-serif;
+  --font-accent: 'Inter', sans-serif;
+  --font-display: 'Bebas Neue', sans-serif;
 }
 
 :root {

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 const Hero = () => {
     return (
-        <section className="relative min-h-screen flex items-center overflow-hidden">
+        <section className="relative min-h-[85vh] flex items-center overflow-hidden">
             {/* Video Background */}
             <div className="absolute inset-0">
                 <video
@@ -66,7 +66,7 @@ const Hero = () => {
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.7, delay: 0.1 }}
-                        className="text-6xl md:text-7xl lg:text-8xl font-heading leading-[0.9] mb-6"
+                        className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading leading-[0.9] mb-6"
                     >
                         <span className="text-white">The Legend</span>
                         <br />
@@ -102,19 +102,13 @@ const Hero = () => {
                                 <ArrowRight size={20} />
                             </motion.button>
                         </Link>
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className="flex items-center gap-3 px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-bold rounded-full hover:bg-white/20 transition-all uppercase tracking-wide"
-                        >
-                            <Play size={18} fill="white" />
-                            Watch Story
-                        </motion.button>
+
                     </motion.div>
                 </div>
             </div>
 
             {/* Scroll Indicator */}
+            {/*             
             <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -127,7 +121,7 @@ const Hero = () => {
                         className="w-1.5 h-1.5 bg-white rounded-full"
                     />
                 </div>
-            </motion.div>
+            </motion.div> */}
         </section>
     );
 };
