@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Minus, Plus, CreditCard, Banknote, MessageCircle, CheckCircle, Smartphone } from 'lucide-react';
+import { X, Minus, Plus, CreditCard, Banknote, MessageCircle, CheckCircle } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 
-const MERCHANT_UPI = "example@upi"; // REPLACE WITH REAL ID
-const MERCHANT_NAME = "Da Rambo Pizza";
+
 
 const CheckoutModal = () => {
     const {
@@ -48,23 +47,102 @@ const CheckoutModal = () => {
         return `https://wa.me/918448161446?text=${message}`; // Replace number
     };
 
-    const handlePlaceOrder = () => {
+    const handlePlaceOrder = async () => {
         if (!tableId) {
             alert("Please enter a table number");
             return;
         }
 
-        const whatsappUrl = generateWhatsAppMessage();
-        window.open(whatsappUrl, '_blank');
-        setOrderStep('success');
+        // ✅ Cash: skip payment gateway, send order via WhatsApp directly
+        if (paymentMethod === 'Cash') {
+            const whatsappUrl = generateWhatsAppMessage();
+            window.open(whatsappUrl, '_blank');
+            setOrderStep('success');
+            return;
+        }
+
+        if (!window.Razorpay) {
+            alert("❌ Razorpay SDK not loaded. Disable any ad-blocker and refresh the page.");
+            return;
+        }
+
+        // ✅ UPI: go through Razorpay
+        try {
+            console.log("🔵 Step 1: Contacting backend...");
+
+            let res;
+            try {
+                res = await fetch("http://localhost:5000/create-order", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount: cartTotal }),
+                    signal: AbortSignal.timeout(12000) // fail after 12s
+                });
+            } catch (networkErr) {
+                alert("❌ Cannot reach backend at localhost:5000.\n\nMake sure 'node server.js' is running.\n\nError: " + networkErr.message);
+                return;
+            }
+
+            console.log("🔵 Step 2: Backend responded. Status:", res.status);
+
+            if (!res.ok) {
+                const errData = await res.json();
+                alert(`❌ Backend error (${res.status}): ${errData.error || 'Unknown error'}`);
+                return;
+            }
+
+            const order = await res.json();
+            console.log("🔵 Step 3: Order created:", order.id, "amount:", order.amount);
+
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SeerMHEIaLoRMO",
+                amount: order.amount,
+                currency: "INR",
+                name: "Da Rambo Pizza",
+                description: `Table ${tableId}`,
+                order_id: order.id,
+
+                handler: async function (response) {
+                    console.log("🔵 Step 4: Payment done, verifying...");
+                    const verify = await fetch("http://localhost:5000/verify-payment", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(response)
+                    });
+
+                    const result = await verify.json();
+                    console.log("🔵 Step 5: Verification result:", result);
+
+                    if (result.success) {
+                        const whatsappUrl = generateWhatsAppMessage();
+                        window.open(whatsappUrl, '_blank');
+                        setOrderStep('success');
+                    } else {
+                        alert("Payment verification failed ❌. Please contact staff.");
+                    }
+                },
+
+                modal: {
+                    ondismiss: function () {
+                        console.log("🔵 Razorpay modal dismissed.");
+                    }
+                }
+            };
+
+            console.log("🔵 Step 3b: Opening Razorpay with key:", options.key);
+            const rzp = new window.Razorpay(options);
+            rzp.open();
+
+        } catch (err) {
+            console.error("❌ Unexpected payment error:", err);
+            alert("Unexpected error: " + err.message);
+        }
     };
 
-    const getUpiLink = () => {
-        // Deep link format
-        // upi://pay?pa=UPI_ID&pn=NAME&am=AMOUNT&cu=INR&tn=NOTE
-        const note = `Table ${tableId}`;
-        return `upi://pay?pa=${MERCHANT_UPI}&pn=${MERCHANT_NAME}&am=${cartTotal}&cu=INR&tn=${note}`;
-    };
+
+
+
+
 
     return (
         <AnimatePresence>
@@ -166,23 +244,17 @@ const CheckoutModal = () => {
                                         </div>
                                     </div>
 
-                                    {/* UPI Section */}
+                                    {/* UPI Info — Razorpay handles the full UPI flow */}
                                     {paymentMethod === 'UPI' && (
                                         <motion.div
                                             initial={{ opacity: 0, height: 0 }}
                                             animate={{ opacity: 1, height: 'auto' }}
-                                            className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-4 text-center space-y-3"
+                                            className="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-4 space-y-2"
                                         >
-                                            <a
-                                                href={getUpiLink()}
-                                                className="block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors"
-                                            >
-                                                <Smartphone size={18} />
-                                                Pay ₹{cartTotal} via App
-                                            </a>
+                                            <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold">Paying To</p>
+                                            <p className="text-white font-bold text-lg font-mono">8448161446@ptaxis</p>
                                             <p className="text-xs text-blue-300">
-                                                Tap above to pay via GPay/PhonePe.<br />
-                                                <span className="font-bold">Then click "Send Order" below.</span>
+                                                💳 Click <span className="font-bold text-white">"Confirm & Pay"</span> below to pay securely via Razorpay (GPay, PhonePe, UPI, Cards).
                                             </p>
                                         </motion.div>
                                     )}
@@ -215,7 +287,7 @@ const CheckoutModal = () => {
                                     className="w-full bg-white text-black font-heading text-xl py-4 rounded-2xl hover:bg-pizza-red hover:text-white transition-all shadow-lg flex items-center justify-center gap-2"
                                 >
                                     <MessageCircle size={24} />
-                                    {paymentMethod === 'UPI' ? 'Confirm & Send Order' : `Place Order • ₹${cartTotal}`}
+                                    {paymentMethod === 'UPI' ? `Confirm & Pay • ₹${cartTotal}` : `Place Order • ₹${cartTotal}`}
                                 </button>
                             ) : (
                                 <button
