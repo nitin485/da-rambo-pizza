@@ -72,14 +72,14 @@ const CheckoutModal = () => {
 
             let res;
             try {
-                res = await fetch("http://localhost:5000/create-order", {
+                res = await fetch("https://da-rambo-pizza-production.up.railway.app/create-order", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ amount: cartTotal }),
                     signal: AbortSignal.timeout(12000) // fail after 12s
                 });
             } catch (networkErr) {
-                alert("❌ Cannot reach backend at localhost:5000.\n\nMake sure 'node server.js' is running.\n\nError: " + networkErr.message);
+                alert("❌ Cannot reach backend.\n\nError: " + networkErr.message);
                 return;
             }
 
@@ -104,7 +104,7 @@ const CheckoutModal = () => {
 
                 handler: async function (response) {
                     console.log("🔵 Step 4: Payment done, verifying...");
-                    const verify = await fetch("http://localhost:5000/verify-payment", {
+                    const verify = await fetch("https://da-rambo-pizza-production.up.railway.app/verify-payment", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(response)
