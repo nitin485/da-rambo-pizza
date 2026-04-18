@@ -19,7 +19,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-  origin: "https://da-rambo-pizza.vercel.app/" // 🔁 replace with your real Vercel URL
+  origin: "https://da-rambo-pizza.vercel.app" // 🔁 replace with your real Vercel URL
 }));
 
 // ✅ Razorpay instance
