@@ -53,7 +53,7 @@ app.post("/create-order", async (req, res) => {
     );
 
     console.log("✅ Order created:", order.id);
-    res.json(order);
+    res.json({ ...order, key_id: process.env.KEY_ID });
 
   } catch (err) {
     console.error("❌ Order creation failed:", err.message);

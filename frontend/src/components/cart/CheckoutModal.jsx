@@ -95,7 +95,7 @@ const CheckoutModal = () => {
             console.log("🔵 Step 3: Order created:", order.id, "amount:", order.amount);
 
             const options = {
-                key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SeerMHEIaLoRMO",
+                key: order.key_id || import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_SeerMHEIaLoRMO",
                 amount: order.amount,
                 currency: "INR",
                 name: "Da Rambo Pizza",
