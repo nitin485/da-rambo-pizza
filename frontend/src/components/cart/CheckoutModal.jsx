@@ -88,7 +88,8 @@ const CheckoutModal = () => {
             let res = await fetch("https://da-rambo-pizza-production.up.railway.app/create-order", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: cartTotal }),
+                body: JSON.stringify({ amount: Number(cartTotal) }),
+
                 signal: AbortSignal.timeout(12000)
             });
 
