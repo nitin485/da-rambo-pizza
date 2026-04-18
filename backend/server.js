@@ -19,7 +19,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-  origin: ["https://da-rambo-pizza.vercel.app", "http://localhost:5173"] // Allow Vercel and local testing
+  origin: "*" // Allow all origins for easier local testing
 }));
 
 // ✅ Razorpay instance
